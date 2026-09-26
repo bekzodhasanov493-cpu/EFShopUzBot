@@ -308,12 +308,14 @@
     // =========================
 
     function paymentDone() {
-
-        alert(
-            "To‘lov tasdiqlash uchun yuboriladi."
+    if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.sendData(
+            JSON.stringify({
+                action: "payment_done"
+            })
         );
-
     }
+}
 
 
     // =========================
