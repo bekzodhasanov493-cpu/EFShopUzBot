@@ -307,10 +307,12 @@
     // TO‘LOV QILDIM
     // =========================
 
-   function paymentDone() {
+  function paymentDone() {
     if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.openTelegramLink(
-            "https://t.me/EFShopUzBot?start=payment_done"
+        Telegram.WebApp.sendData(
+            JSON.stringify({
+                action: "payment_done"
+            })
         );
     }
 }
