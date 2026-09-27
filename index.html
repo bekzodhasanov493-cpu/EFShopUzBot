@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>DLS XASANOV — To‘lov</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, #12345a 0%, #07111f 45%, #03070d 100%);
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .app {
+            max-width: 430px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            text-align: center;
+            padding-top: 20px;
+            margin-bottom: 28px;
+        }
+
+        .logo-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 12px;
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #0d8cff, #00d4ff);
+            box-shadow: 0 0 35px rgba(0, 180, 255, 0.35);
+            font-size: 34px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .logo p {
+            color: #8ea4bc;
+            margin-top: 6px;
+            font-size: 14px;
+        }
+
+        .card {
+            background: rgba(15, 29, 47, 0.92);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 22px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.35);
+            backdrop-filter: blur(10px);
+        }
+
+        .label {
+            color: #8197ae;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 22px;
+        }
+
+        .amount span {
+            font-size: 17px;
+            color: #8ea4bc;
+            font-weight: 500;
+        }
+
+        .info {
+            background: #0a1728;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 7px 0;
+        }
+
+        .info-row span:first-child {
+            color: #8197ae;
+        }
+
+        .info-row span:last-child {
+            font-weight: 700;
+        }
+
+        .timer-box {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .timer-label {
+            color: #8197ae;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .timer {
+            font-size: 32px;
+            font-weight: 800;
+            color: #00d4ff;
+            letter-spacing: 2px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 15px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        button:active {
+            transform: scale(0.97);
+        }
+
+        .pay-btn {
+            background: linear-gradient(135deg, #00c853, #00a844);
+            color: white;
+            box-shadow: 0 8px 25px rgba(0, 200, 83, 0.22);
+        }
+
+        .cancel-btn {
+            background: #182536;
+            color: #ff6b6b;
+            border: 1px solid rgba(255,107,107,0.15);
+        }
+
+        .footer {
+            text-align: center;
+            color: #60758b;
+            font-size: 12px;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+
+        .success {
+            display: none;
+            text-align: center;
+            padding: 25px 10px;
+        }
+
+        .success-icon {
+            width: 75px;
+            height: 75px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: rgba(0, 200, 83, 0.12);
+            color: #00e676;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+        }
+
+        .success h2 {
+            font-size: 23px;
+            margin-bottom: 10px;
+        }
+
+        .success p {
+            color: #8ea4bc;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="logo">
+        <div class="logo-icon">⚽</div>
+
+        <h1>DLS | XASANOV</h1>
+
+        <p>To‘lov oynasi</p>
+    </div>
+
+    <div class="card" id="paymentCard">
+
+        <div class="label">
+            To‘lov summasi
+        </div>
+
+        <div class="amount">
+            10 000 <span>so‘m</span>
+        </div>
+
+        <div class="info">
+
+            <div class="info-row">
+                <span>💳 Karta</span>
+                <span>**** **** **** 1234</span>
+            </div>
+
+            <div class="info-row">
+                <span>🧾 Buyurtma</span>
+                <span>#DLS-0001</span>
+            </div>
+
+        </div>
+
+        <div class="timer-box">
+
+            <div class="timer-label">
+                To‘lov uchun qolgan vaqt
+            </div>
+
+            <div class="timer" id="timer">
+                05:00
+            </div>
+
+        </div>
+
+        <div class="buttons">
+
+            <button class="pay-btn" onclick="paymentDone()">
+                ✅ To‘lov qildim
+            </button>
+
+            <button class="cancel-btn" onclick="cancelPayment()">
+                ❌ Bekor qilish
+            </button>
+
+        </div>
+
+        <div class="footer">
+            To‘lov amalga oshirilgandan so‘ng
+            bot orqali avtomatik tekshiriladi.
+        </div>
+
+    </div>
+
+
+    <div class="card success" id="successCard">
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h2>To‘lov yuborildi</h2>
+
+        <p>
+            To‘lovingiz tekshirilmoqda.<br>
+            Iltimos, botga qayting.
+        </p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+
+    let timeLeft = 5 * 60;
+
+
+    function updateTimer() {
+
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+
+        document.getElementById("timer").textContent =
+            String(minutes).padStart(2, "0") +
+            ":" +
+            String(seconds).padStart(2, "0");
+
+        if (timeLeft <= 0) {
+
+            document.getElementById("timer").textContent = "00:00";
+
+            alert("⏰ To‘lov vaqti tugadi.");
+
+            tg.close();
+
+            return;
+        }
+
+        timeLeft--;
+
+    }
+
+
+    updateTimer();
+
+    setInterval(updateTimer, 1000);
+
+
+    function paymentDone() {
+
+        tg.sendData(
+            JSON.stringify({
+                action: "payment_done"
+            })
+        );
+
+        document.getElementById("paymentCard").style.display = "none";
+        document.getElementById("successCard").style.display = "block";
+    }
+
+
+    function cancelPayment() {
+
+        tg.sendData(
+            JSON.stringify({
+                action: "cancel_payment"
+            })
+        );
+
+        tg.close();
+    }
+
+</script>
+
+</body>
+</html>
