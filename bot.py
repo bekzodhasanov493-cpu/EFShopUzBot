@@ -1224,12 +1224,15 @@ async def back_to_preview_handler(callback: CallbackQuery):
         ]
     )
 
-    await bot.send_photo(
-        chat_id=user_id,
-        photo=data["account_photo"],
-        caption=preview_text,
-        reply_markup=preview_keyboard
-    )
+    preview_message = await bot.send_photo(
+    chat_id=user_id,
+    photo=data["account_photo"],
+    caption=preview_text,
+    reply_markup=preview_keyboard
+)
+
+user_messages[user_id] = preview_message.message_id
+
 @dp.callback_query(F.data == "edit_google_game")
 async def edit_google_game_handler(callback: CallbackQuery):
     user_id = callback.from_user.id
