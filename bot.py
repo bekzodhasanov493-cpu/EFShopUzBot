@@ -1446,14 +1446,50 @@ async def payment_done_handler(callback: CallbackQuery):
 # BOTNI ISHGA TUSHIRISH
 # =========================================================
 
+async def health_server(reader, writer):
+    try:
+        await reader.read(1024)
+
+        response = (
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain; charset=utf-8\r\n"
+            "Content-Length: 2\r\n"
+            "Connection: close\r\n"
+            "\r\n"
+            "OK"
+        )
+
+        writer.write(response.encode())
+        await writer.drain()
+
+    except Exception:
+        pass
+
+    finally:
+        writer.close()
+        await writer.wait_closed()
+
+
 async def main():
     logging.basicConfig(
         level=logging.INFO
     )
 
+    port = int(os.getenv("PORT", "10000"))
+
+    server = await asyncio.start_server(
+        health_server,
+        "0.0.0.0",
+        port
+    )
+
+    print(f"🌐 Server port: {port}")
     print("✅ EFShopUzBot ishga tushdi!")
 
-    await dp.start_polling(bot)
+    await asyncio.gather(
+        dp.start_polling(bot),
+        server.serve_forever()
+    )
 
 
 # =========================================================
