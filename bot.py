@@ -120,7 +120,6 @@ def get_payment_fee(price):
     else:
         return 5000
 
-
 def create_hamyon_payment(amount, order_id):
     try:
         response = requests.post(
@@ -145,7 +144,6 @@ def create_hamyon_payment(amount, order_id):
             "ok": False,
             "error": "connection_error"
         }
-
 
 # =========================================================
 # MAJBURIY OBUNA OYNASI
@@ -449,9 +447,16 @@ async def back_to_main_callback(callback: CallbackQuery):
     # Ichki oynani o‘chirish
     await delete_previous_message(user_id)
 
-    # Asosiy sahifa allaqachon mavjud bo‘lsa,
-    # uni qaytadan yubormaymiz
-    await open_main_menu(user_id)
+    # Asosiy menyuni yangi oynada ochish
+    message = await bot.send_message(
+        chat_id=user_id,
+        text=(
+            "🛍 <b>Kerakli bo‘limni tanlang:</b>"
+        ),
+        reply_markup=main_menu()
+    )
+
+    user_messages[user_id] = message.message_id
 # =========================
 # ELON BERISH
 # =========================
@@ -940,20 +945,22 @@ async def sell_text_handler(message: Message):
             ]
         )
 
-        # Eski oynani o‘chiramiz
+               # Eski oynani o‘chiramiz
         await delete_previous_message(user_id)
 
         # =========================
         # RASM BILAN PREVIEW
         # =========================
-        await bot.send_photo(
+        preview_message = await bot.send_photo(
             chat_id=user_id,
             photo=data["account_photo"],
             caption=preview_text,
             reply_markup=preview_keyboard
         )
 
-        return
+        user_messages[user_id] = preview_message.message_id
+
+
 @dp.callback_query(F.data == "confirm_preview")
 async def confirm_preview_handler(callback: CallbackQuery):
     user_id = callback.from_user.id
@@ -962,7 +969,6 @@ async def confirm_preview_handler(callback: CallbackQuery):
 
     if user_id not in user_data:
         return
-
     data = user_data[user_id]
 
     # =========================
@@ -1216,7 +1222,7 @@ async def back_to_preview_handler(callback: CallbackQuery):
                 )
             ],
             [
-                InlineKeyboardButton(
+                   InlineKeyboardButton(
                     text="❌ Bekor qilish",
                     callback_data="back_to_main"
                 )
@@ -1225,13 +1231,13 @@ async def back_to_preview_handler(callback: CallbackQuery):
     )
 
     preview_message = await bot.send_photo(
-    chat_id=user_id,
-    photo=data["account_photo"],
-    caption=preview_text,
-    reply_markup=preview_keyboard
-)
+        chat_id=user_id,
+        photo=data["account_photo"],
+        caption=preview_text,
+        reply_markup=preview_keyboard
+    )
 
-user_messages[user_id] = preview_message.message_id
+    user_messages[user_id] = preview_message.message_id
 
 @dp.callback_query(F.data == "edit_google_game")
 async def edit_google_game_handler(callback: CallbackQuery):
@@ -1471,6 +1477,31 @@ async def health_server(reader, writer):
     finally:
         writer.close()
         await writer.wait_closed()
+async def hamyon_webhook(reader, writer):
+    try:
+        body = await reader.read(1024)
+
+        print("💰 Hamyon webhook keldi:")
+        print(body.decode(errors="ignore"))
+
+        response = (
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: application/json\r\n"
+            "Content-Length: 12\r\n"
+            "Connection: close\r\n"
+            "\r\n"
+            '{"ok":true}'
+        )
+
+        writer.write(response.encode())
+        await writer.drain()
+
+    except Exception as e:
+        logging.error(f"Webhook xatosi: {e}")
+
+    finally:
+        writer.close()
+        await writer.wait_closed()
 
 
 async def main():
@@ -1486,12 +1517,19 @@ async def main():
         port
     )
 
+    webhook_server = await asyncio.start_server(
+        hamyon_webhook,
+        "0.0.0.0",
+        10001
+    )
+
     print(f"🌐 Server port: {port}")
     print("✅ EFShopUzBot ishga tushdi!")
 
     await asyncio.gather(
         dp.start_polling(bot),
-        server.serve_forever()
+        server.serve_forever(),
+        webhook_server.serve_forever()
     )
 
 
